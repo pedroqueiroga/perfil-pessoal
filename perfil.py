@@ -1,4 +1,3 @@
-import operator
 import unicodedata
 import re
 
@@ -18,6 +17,8 @@ with open("perfil.html",encoding="utf8") as readfile:
     precoreq_cadeira_regex = re.compile("<div style=\"position:absolute;left:62.50px;top:\d+\.\d+px\" class=\"cls_008\"><span class=\"cls_008\">([A-Z]{2}\d{3,}) ?- ?.*</span></div>")
 
     equiv_regex = re.compile("<div style=\"position:absolute;left:62.64px;top:\d+\.\d+px\" class=\"cls_007\"><span class=\"cls_007\">EQUIVAL.NCIA:</span></div>")
+
+    ementa_regex = re.compile("<div style=\"position:absolute;left:62.64px;top:\d+\.\d+px\" class=\"cls_007\"><span class=\"cls_007\">EMENTA:</span></div>")
 
     p = None
     pp = None
@@ -40,10 +41,6 @@ with open("perfil.html",encoding="utf8") as readfile:
 
         cadeira_match = cadeira_regex.search(line)
         if cadeira_match:
-            if cadeira_construcao != {}:
-                disciplinas_perfil[pp].append(cadeira_construcao)
-                cadeira_construcao = {}
-
             cadeira_construcao["codigo"] = cadeira_match.group(1)
             cadeira_construcao["nome"] = cadeira_match.group(2)
             cadeira_construcao["prereq"] = []
@@ -75,14 +72,18 @@ with open("perfil.html",encoding="utf8") as readfile:
                 continue
 
         equiv_match = equiv_regex.search(line)
+        # TODO: equivalencia importa para estes propositos?
         if equiv_match:
             inside_prereq = False
             inside_coreq = False
             continue
 
-        # TODO: equivalencia importa para estes propositos?
+        ementa_match = ementa_regex.search(line)
+        if ementa_match and cadeira_construcao != {}:
+            # insere a cadeira naquele periodo
+            disciplinas_perfil[pp].append(cadeira_construcao)
+            cadeira_construcao = {}
 
-    disciplinas_perfil[pp].append(cadeira_construcao)
 
     for p in disciplinas_perfil:
         print(p,":", sep='')
