@@ -5,20 +5,52 @@ normform="NFC"
 
 disciplinas_perfil = {}
 
-with open("perfil.html",encoding="utf8") as readfile:
-    periodo_regex = re.compile(">PER.ODO: (\d+).</span")
-    cadeira_regex = re.compile("<div style=\"position:absolute;left:59\.81px;top:\d+\.\d+px\" class=\"cls_006\"><span class=\"cls_006\">([A-Z]{2}\d{3,}) ?- ?(.+)</span></div>")
+with open("ciencia_computacao_perfil_2002-html.html",encoding="utf8") as readfile:
+
+    formula_regex_str = '[A-Z]{2}\d{3,}'
+
+    formula_regex = re.compile(formula_regex_str)
+        
+    periodo_regex = re.compile(
+        ('<p style="position:absolute;top:\d{3,}px;left:90px;white-space'
+         ':nowrap" class="ft\d+0"><i><b>PER.ODO:&#160;(\d).</b></i></p>'))
     
-    prereq_regex = re.compile("<div style=\"position:absolute;left:62.64px;top:\d+\.\d+px\" class=\"cls_007\"><span class=\"cls_007\">PR.-REQUISITO:</span></div>")
-    prereq_None_regex = re.compile("<div style=\"position:absolute;left:164.41px;top:\d+\.\d+px\" class=\"cls_008\"><span class=\"cls_008\">N.o h. Pr.-Requisito para esse Componente Curricular\.</span></div>")
-    coreq_regex = re.compile("<div style=\"position:absolute;left:62.64px;top:\d+\.\d+px\" class=\"cls_007\"><span class=\"cls_007\">CO-REQUISITO:</span></div>")
-    coreq_None_regex = re.compile("<div style=\"position:absolute;left:164.41px;top:\d+\.\d+px\" class=\"cls_008\"><span class=\"cls_008\">N.o h. Co-Requisito para esse Componente Curricular\.</span></div>")
+    cadeira_regex = re.compile(
+        ('<p style="position:absolute;top:\d{{3,}}px;left:90px;'
+         'white-space:nowrap" class="ft\d+1"><b>'
+         '({}) ?- ?(.+)</b></p>').format(formula_regex_str))
+    
+    prereq_regex = re.compile(
+        ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
+         'nowrap" class="ft\d+2"><b>PR.-REQUISITO:</b></p>'))
+    
+    prereq_None_regex = re.compile(
+        ('<p style="position:absolute;top:\d{3,}px;left:247px;white-space:'
+         'nowrap" class="ft\d+3">N.o&#160;h.&#160;Pr.-Requisito&#160;para&#160'
+         ';esse&#160;Componente&#160;Curricular.</p>'))
+    
+    coreq_regex = re.compile(
+        ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
+         'nowrap" class="ft\d+2"><b>CO-REQUISITO:</b></p>'))
+    
+    coreq_None_regex = re.compile(
+        ('<p style="position:absolute;top:\d{3,}px;left:247px;white-space:'
+         'nowrap" class="ft\d+3">N.o&#160;h.&#160;Co-Requisito&#160;para&#160;'
+         'esse&#160;Componente&#160;Curricular.</p>'))
 
-    precoreq_cadeira_regex = re.compile("<div style=\"position:absolute;left:62.50px;top:\d+\.\d+px\" class=\"cls_008\"><span class=\"cls_008\">([A-Z]{2}\d{3,}) ?- ?.*</span></div>")
+    precoreq_cadeiras_regex = re.compile(
+        ('<p style="position:absolute;top:\d{{3,}}px;'
+         'left:247px;white-space:nowrap" class="ft\d+3">'
+         'F.rmula:&#160;.*?((?:{}.*?)+)'
+         '\)?</p>').format(formula_regex_str))
 
-    equiv_regex = re.compile("<div style=\"position:absolute;left:62.64px;top:\d+\.\d+px\" class=\"cls_007\"><span class=\"cls_007\">EQUIVAL.NCIA:</span></div>")
+    equiv_regex = re.compile(
+        ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
+         'nowrap" class="ft\d+2"><b>EQUIVAL.NCIA:</b></p>'))
 
-    ementa_regex = re.compile("<div style=\"position:absolute;left:62.64px;top:\d+\.\d+px\" class=\"cls_007\"><span class=\"cls_007\">EMENTA:</span></div>")
+    ementa_regex = re.compile(
+        ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
+         'nowrap" class="ft\d+2"><b>EMENTA:</b></p>'))
 
     p = None
     pp = None
@@ -41,11 +73,20 @@ with open("perfil.html",encoding="utf8") as readfile:
 
         cadeira_match = cadeira_regex.search(line)
         if cadeira_match:
+
+            if cadeira_construcao != {}:
+                # insere a cadeira naquele periodo
+                disciplinas_perfil[pp].append(cadeira_construcao)
+                cadeira_construcao = {}
+
+            # comeca nova cadeira
             cadeira_construcao["codigo"] = cadeira_match.group(1)
-            cadeira_construcao["nome"] = cadeira_match.group(2)
+            cadeira_construcao["nome"] = cadeira_match.group(2).replace(
+                '&#160;', ' ')
             cadeira_construcao["prereq"] = []
             cadeira_construcao["coreq"] = []
             pp = p
+            print(cadeira_construcao)
             continue
 
         prereq_match = prereq_regex.search(line)
@@ -54,9 +95,11 @@ with open("perfil.html",encoding="utf8") as readfile:
             continue
 
         if inside_prereq:
-            prereq_cadeira_match = precoreq_cadeira_regex.search(line)
-            if prereq_cadeira_match:
-                cadeira_construcao["prereq"].append(prereq_cadeira_match.group(1))
+            prereq_cadeiras_match = precoreq_cadeiras_regex.search(line)
+            if prereq_cadeiras_match:
+                cadeiras_group = prereq_cadeiras_match.group(1)
+                cadeiras = formula_regex.findall(cadeiras_group)
+                cadeira_construcao["prereq"].extend(cadeiras)
                 continue
         
         coreq_match = coreq_regex.search(line)
@@ -66,9 +109,11 @@ with open("perfil.html",encoding="utf8") as readfile:
             continue
 
         if inside_coreq:
-            coreq_cadeira_match = precoreq_cadeira_regex.search(line)
-            if coreq_cadeira_match:
-                cadeira_construcao["coreq"].append(coreq_cadeira_match.group(1))
+            coreq_cadeiras_match = precoreq_cadeiras_regex.search(line)
+            if coreq_cadeiras_match:
+                cadeiras_group = coreq_cadeiras_match.group(1)
+                cadeiras = formula_regex.findall(cadeiras_group)
+                cadeira_construcao["coreq"].extend(cadeiras)
                 continue
 
         equiv_match = equiv_regex.search(line)
@@ -79,10 +124,7 @@ with open("perfil.html",encoding="utf8") as readfile:
             continue
 
         ementa_match = ementa_regex.search(line)
-        if ementa_match and cadeira_construcao != {}:
-            # insere a cadeira naquele periodo
-            disciplinas_perfil[pp].append(cadeira_construcao)
-            cadeira_construcao = {}
+        
 
 
     for p in disciplinas_perfil:
