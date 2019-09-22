@@ -3,6 +3,12 @@
 import unicodedata
 import re
 import sys
+import html
+
+def unescapeHTML(text):
+    return html.unescape(text.replace('<br/>', ' ')).replace(
+        '\xa0', ' ').strip()
+
 
 disciplinas_perfil = {}
 
@@ -16,45 +22,45 @@ with open(html_file, encoding='utf8') as readfile:
         
     periodo_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:90px;white-space'
-         ':nowrap" class="ft\d+0"><i><b>(?:PER.ODO:&#160;(\d).|'
+         ':nowrap" class="ft\d+"><i><b>(?:PER.ODO:&#160;(\d).|'
          '(SEM&#160;PERIODIZA..O))</b></i></p>'))
     
     cadeira_regex = re.compile(
         ('<p style="position:absolute;top:\d{{3,}}px;left:90px;'
-         'white-space:nowrap" class="ft\d+1"><b>'
+         'white-space:nowrap" class="ft\d+"><b>'
          '({}) ?- ?(.+)</b></p>').format(formula_regex_str))
     
     prereq_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
-         'nowrap" class="ft\d+2"><b>PR.-REQUISITO:</b></p>'))
+         'nowrap" class="ft\d+"><b>PR.-REQUISITO:</b></p>'))
     
     prereq_None_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:247px;white-space:'
-         'nowrap" class="ft\d+3">N.o&#160;h.&#160;Pr.-Requisito&#160;para&#160'
+         'nowrap" class="ft\d+">N.o&#160;h.&#160;Pr.-Requisito&#160;para&#160'
          ';esse&#160;Componente&#160;Curricular.</p>'))
     
     coreq_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
-         'nowrap" class="ft\d+2"><b>CO-REQUISITO:</b></p>'))
+         'nowrap" class="ft\d+"><b>CO-REQUISITO:</b></p>'))
     
     coreq_None_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:247px;white-space:'
-         'nowrap" class="ft\d+3">N.o&#160;h.&#160;Co-Requisito&#160;para&#160;'
+         'nowrap" class="ft\d+">N.o&#160;h.&#160;Co-Requisito&#160;para&#160;'
          'esse&#160;Componente&#160;Curricular.</p>'))
 
     precoreq_cadeiras_regex = re.compile(
         ('<p style="position:absolute;top:\d{{3,}}px;'
-         'left:247px;white-space:nowrap" class="ft\d+3">'
+         'left:247px;white-space:nowrap" class="ft\d+">'
          'F.rmula:&#160;.*?((?:{}.*?)+)'
          '\)?</p>').format(formula_regex_str))
 
     equiv_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
-         'nowrap" class="ft\d+2"><b>EQUIVAL.NCIA:</b></p>'))
+         'nowrap" class="ft\d+"><b>EQUIVAL.NCIA:</b></p>'))
 
     ementa_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:94px;white-space:'
-         'nowrap" class="ft\d+2"><b>EMENTA:</b></p>'))
+         'nowrap" class="ft\d+"><b>EMENTA:</b></p>'))
 
     p = None
     pp = None
@@ -68,8 +74,7 @@ with open(html_file, encoding='utf8') as readfile:
         periodo_match = periodo_regex.search(line)
 
         if periodo_match:
-            p = periodo_match.group(1) or periodo_match.group(2).replace(
-                '&#160;', ' ')
+            p = periodo_match.group(1) or unescapeHTML(periodo_match.group(2))
             # se não tem uma entrada para aquele periodo ainda, criar
             if not (p in disciplinas_perfil.keys()):
                 disciplinas_perfil[p] = []
@@ -92,8 +97,7 @@ with open(html_file, encoding='utf8') as readfile:
 
             # comeca nova cadeira
             cadeira_construcao['codigo'] = cadeira_match.group(1)
-            cadeira_construcao['nome'] = cadeira_match.group(2).replace(
-                '&#160;', ' ')
+            cadeira_construcao['nome'] = unescapeHTML(cadeira_match.group(2))
             cadeira_construcao['prereq'] = []
             cadeira_construcao['coreq'] = []
             cadeira_construcao['equiv'] = []
