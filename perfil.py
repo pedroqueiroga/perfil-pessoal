@@ -1,11 +1,11 @@
 import unicodedata
 import re
 
-normform="NFC"
+normform='NFC'
 
 disciplinas_perfil = {}
 
-with open("ciencia_computacao_perfil_2002-html.html",encoding="utf8") as readfile:
+with open('ciencia_computacao_perfil_2002-html.html',encoding='utf8') as readfile:
 
     formula_regex_str = '[A-Z]{2}\d{3,}'
 
@@ -79,14 +79,20 @@ with open("ciencia_computacao_perfil_2002-html.html",encoding="utf8") as readfil
                 disciplinas_perfil[pp].append(cadeira_construcao)
                 cadeira_construcao = {}
 
+                # reseta flags
+                inside_prereq = False
+                inside_coreq = False
+                inside_equiv = False
+                    
+
             # comeca nova cadeira
-            cadeira_construcao["codigo"] = cadeira_match.group(1)
-            cadeira_construcao["nome"] = cadeira_match.group(2).replace(
+            cadeira_construcao['codigo'] = cadeira_match.group(1)
+            cadeira_construcao['nome'] = cadeira_match.group(2).replace(
                 '&#160;', ' ')
-            cadeira_construcao["prereq"] = []
-            cadeira_construcao["coreq"] = []
+            cadeira_construcao['prereq'] = []
+            cadeira_construcao['coreq'] = []
+            cadeira_construcao['equiv'] = []
             pp = p
-            print(cadeira_construcao)
             continue
 
         prereq_match = prereq_regex.search(line)
@@ -99,12 +105,15 @@ with open("ciencia_computacao_perfil_2002-html.html",encoding="utf8") as readfil
             if prereq_cadeiras_match:
                 cadeiras_group = prereq_cadeiras_match.group(1)
                 cadeiras = formula_regex.findall(cadeiras_group)
-                cadeira_construcao["prereq"].extend(cadeiras)
+                cadeira_construcao['prereq'].extend(cadeiras)
+                inside_prereq = False
+                continue
+            elif prereq_None_regex.search(line):
+                inside_prereq = False
                 continue
         
         coreq_match = coreq_regex.search(line)
         if coreq_match:
-            inside_prereq = False
             inside_coreq = True
             continue
 
@@ -113,22 +122,39 @@ with open("ciencia_computacao_perfil_2002-html.html",encoding="utf8") as readfil
             if coreq_cadeiras_match:
                 cadeiras_group = coreq_cadeiras_match.group(1)
                 cadeiras = formula_regex.findall(cadeiras_group)
-                cadeira_construcao["coreq"].extend(cadeiras)
+                cadeira_construcao['coreq'].extend(cadeiras)
+                inside_coreq = False
+                continue
+            elif coreq_None_regex.search(line):
+                inside_coreq = False
                 continue
 
         equiv_match = equiv_regex.search(line)
-        # TODO: equivalencia importa para estes propositos?
         if equiv_match:
-            inside_prereq = False
-            inside_coreq = False
-            continue
+            inside_equiv = True
+
+        if inside_equiv:
+            equiv_cadeiras_match = precoreq_cadeiras_regex.search(line)
+            if equiv_cadeiras_match:
+                cadeiras_group = equiv_cadeiras_match.group(1)
+                cadeiras = formula_regex.findall(cadeiras_group)
+                cadeira_construcao['equiv'].extend(cadeiras)
+                inside_equiv = False
+                continue
 
         ementa_match = ementa_regex.search(line)
-        
+        if ementa_match:
+            inside_equiv = False
+
+
+    if cadeira_construcao != {}:
+        # insere a última cadeira naquele periodo
+        disciplinas_perfil[pp].append(cadeira_construcao)
+        cadeira_construcao = {}
 
 
     for p in disciplinas_perfil:
-        print(p,":", sep='')
+        print(p,':', sep='')
         for d in disciplinas_perfil[p]:
             print('\t',d,sep='')
         print('\n')
