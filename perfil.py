@@ -2,10 +2,13 @@
 
 import unicodedata
 import re
+import sys
 
 disciplinas_perfil = {}
 
-with open('ciencia_computacao_perfil_2002-html.html',encoding='utf8') as readfile:
+html_file = sys.argv[1]
+
+with open(html_file, encoding='utf8') as readfile:
 
     formula_regex_str = '[A-Z]{2}\d{3,}'
 
@@ -13,7 +16,8 @@ with open('ciencia_computacao_perfil_2002-html.html',encoding='utf8') as readfil
         
     periodo_regex = re.compile(
         ('<p style="position:absolute;top:\d{3,}px;left:90px;white-space'
-         ':nowrap" class="ft\d+0"><i><b>PER.ODO:&#160;(\d).</b></i></p>'))
+         ':nowrap" class="ft\d+0"><i><b>(?:PER.ODO:&#160;(\d).|'
+         '(SEM&#160;PERIODIZA..O))</b></i></p>'))
     
     cadeira_regex = re.compile(
         ('<p style="position:absolute;top:\d{{3,}}px;left:90px;'
@@ -64,7 +68,8 @@ with open('ciencia_computacao_perfil_2002-html.html',encoding='utf8') as readfil
         periodo_match = periodo_regex.search(line)
 
         if periodo_match:
-            p = int(periodo_match.group(1))
+            p = periodo_match.group(1) or periodo_match.group(2).replace(
+                '&#160;', ' ')
             # se não tem uma entrada para aquele periodo ainda, criar
             if not (p in disciplinas_perfil.keys()):
                 disciplinas_perfil[p] = []
