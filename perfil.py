@@ -1,7 +1,7 @@
+#!/usr/bin/python3
+
 import unicodedata
 import re
-
-normform='NFC'
 
 disciplinas_perfil = {}
 
