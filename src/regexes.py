@@ -1,6 +1,6 @@
 import re
 
-formula_str = '[A-Z]{2,4}\d{3,}'
+formula_str = '(?:[A-Z]{2}\d{3,}|[A-Z]{4}\d{3,})'
 
 formula = re.compile(formula_str)
 
@@ -23,7 +23,7 @@ coreq_None = re.compile(
     ('N.oh.Co-RequisitoparaesseComponenteCurricular.'))
 
 precoreq_cadeiras = re.compile(
-    ('F.rmula:.*?((?:{}.*)+)\)?').format(formula_str))
+    ('F.rmula:.*?((?:{}(?:E|OU|e|ou|.*))+)\)?').format(formula_str))
 
 equiv = re.compile(
     ('EQUIVAL.NCIA:'))

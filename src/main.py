@@ -1,3 +1,4 @@
+import os
 from .perfil2 import do_everything
 
 from flask import Flask, render_template, request
