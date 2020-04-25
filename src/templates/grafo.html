@@ -1,0 +1,19 @@
+{% extends "visualizador.html" %}
+
+{% block grafo_content %}
+
+{% if grafo %}
+<input type="button" id="hide" value="Esconder arestas">
+<br>
+<label for="slider">Tamanho do grafo</label>
+<input type="range" min="20" max="100" value="42" id="slider">
+<br>
+<object id="grafo">{{ grafo|safe }}</object>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endif %}
+
+{% if error %}
+<p>Erro: {{ error }}</p>
+{% endif %}
+
+{% endblock %}

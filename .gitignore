@@ -1,5 +1,5 @@
 #*#
 *~
-*.html
-*.pdf
+pdfs/
 myvenv/
+__pycache__/

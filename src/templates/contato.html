@@ -1,0 +1,18 @@
+{% extends "index.html" %}
+
+{% block content %}
+<p>Olá. Para entrar em contato, preencha o formulário abaixo.<br>
+  O e-mail é opcional, está aí para que possamos retornar o contato. Pode deixar o campo em branco.</p>
+<form action="contato"
+      method="POST">
+  <label for="email">E-mail:</label>
+  <input type="email" name="email" autofocus="autofocus"><br>
+  <textarea rows="10" cols="42" name="textbox"></textarea>
+  <br><br>
+  <input type="submit">
+</form>
+{% if obrigado %}
+<p>{{ obrigado }}</p>
+{% endif %}
+  
+{% endblock %}

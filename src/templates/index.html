@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>Visualizador de Perfil Curricular</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+  </head>
+  <body>
+    <div class="navbar">
+      <a href="ajuda">Help wanted</a>
+      <a href="contato">Contato</a>
+      <a href="/">Visualizador</a>
+      <span class="separator"/>
+      <a href="https://github.com/pqueiroga/perfil-pessoal" target="_blank" class="github">Github</a>
+    </div>
+    {% block content %}
+    {% endblock %}
+  </body>
+</html>
