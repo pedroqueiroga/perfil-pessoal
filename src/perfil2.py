@@ -1,11 +1,7 @@
 #!/usr/bin/python3
 
-import unicodedata
 import unidecode
-import sys
-import html
 from itertools import zip_longest
-from random import random
 import PyPDF2
 from graphviz import Digraph
 
