@@ -20,6 +20,8 @@ def do_everything(pdf_file):
     pdf = pdftotext.PDF(pdf_file)
 
     curso = None
+    perfil = None
+    universidade = None
 
     p = None
     pp = None
@@ -36,7 +38,12 @@ def do_everything(pdf_file):
 
     # o nome da universidade é a primeira linha
     first_page = pdf[0].split('\n')
-    universidade = unidecode.unidecode(first_page[0].strip())
+
+    try:
+        universidade = unidecode.unidecode(first_page[0].strip())
+    except:
+        print('Não foi possível extrair o nome da universidade')
+
     for page_n in range(len(pdf)):
         page = [ j.strip() for i in pdf[page_n].split('\n') for j in i.split('   ') if j ]
         i = 0
@@ -46,6 +53,11 @@ def do_everything(pdf_file):
             curso_match = regexes.curso.search(line)
             if curso_match and not curso:
                 curso = curso_match.group(1)
+                continue
+
+            perfil_match = regexes.perfil.search(line)
+            if perfil_match and not perfil:
+                perfil = perfil_match.group(1)
                 continue
 
             periodo_match = regexes.periodo.search(line)
@@ -213,7 +225,7 @@ def do_everything(pdf_file):
                     group_leader = group[0]['codigo']
 
         g.viewport='0,0,1,100,100'
-        return g
+        return g, curso, universidade, perfil
     else:
         return None
 

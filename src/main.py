@@ -16,12 +16,17 @@ def graph():
         return render_template('grafo.html',
                                error='Não foi possível aceitar que você enviou '
                                'um pdf.')
-    
-    g = do_everything(f)
-    request.close()
+    try:
+        g, curso, universidade, perfil = do_everything(f)
+    except Exception as e:
+        print('Erro:', e)
+        g = None
+    finally:
+        request.close()
+
     if g:
         grafo = g.pipe().decode('utf-8')
-        return render_template('grafo.html', grafo=grafo)
+        return render_template('grafo.html', grafo=grafo, curso=curso, universidade=universidade, perfil=perfil)
     else:
         return render_template('grafo.html', error='Não foi possível extrair as relações de cadeiras deste pdf. Se você realmente enviou um perfil curricular da UFPE, por favor nos informe criando um bug report no github, ou nos contatando.')
 

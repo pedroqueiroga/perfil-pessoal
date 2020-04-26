@@ -38,4 +38,7 @@ carga_horaria = re.compile(
     ('\d{1,}'))
 
 curso = re.compile(
-    ('Curso: *?(.*)'))
+    ('Curso: *(.*)'))
+
+perfil = re.compile(
+    ('Perfil: *(.*)'))

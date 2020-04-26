@@ -3,6 +3,20 @@
 {% block grafo_content %}
 
 {% if grafo %}
+<div class="grafo-preamble">
+  <p>Grafo carregado com sucesso.
+    {% if universidade %}
+    <br>Universidade: {{ universidade }}
+    {% endif %}
+    {% if curso %}
+    <br>Curso: {{ curso }}
+    {% endif %}
+    {% if perfil %}
+    <br>Perfil: {{ perfil }}
+    {% endif %}
+  </p>
+</div>
+
 <input type="button" id="hide" value="Esconder arestas">
 <br>
 <label for="slider">Tamanho do grafo</label>
