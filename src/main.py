@@ -2,6 +2,7 @@ import os
 from .perfil2 import do_everything
 from . import msgs
 from .settings import settings
+from .email import send_email_to_myself
 import requests
 import io
 import traceback
@@ -53,10 +54,15 @@ def contato():
     if request.method == 'GET':
         return render_template('contato.html')
     else:
-        for k in request.form:
-            print(k, request.form[k])
+        email = request.form['email']
+        text = request.form['textbox']
+        email_text = f'E-mail informado: {email}\n\nTexto:\n{text}'
+        res = send_email_to_myself(email_text)
         request.close()
-        return render_template('contato.html', obrigado=msgs.THANKS_FOR_CONTACT)
+        if res.status_code == requests.codes.ok:
+            return render_template('contato.html', obrigado=msgs.THANKS_FOR_CONTACT)
+        else:
+            return render_template('contato.html', error=msgs.FAILED_CONTACT)
     
 
 @app.route('/ajuda', methods = ['GET'])

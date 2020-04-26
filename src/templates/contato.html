@@ -7,12 +7,15 @@
       method="POST">
   <label for="email">E-mail:</label>
   <input type="email" name="email" autofocus="autofocus"><br>
-  <textarea rows="10" cols="42" name="textbox"></textarea>
+  <textarea rows="10" cols="42" name="textbox" required="required"></textarea>
   <br><br>
   <input type="submit">
 </form>
 {% if obrigado %}
 <p>{{ obrigado }}</p>
+{% endif %}
+{% if error %}
+<p>Erro: {{ error }}</p>
 {% endif %}
   
 {% endblock %}
