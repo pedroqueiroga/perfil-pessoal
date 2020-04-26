@@ -5,7 +5,9 @@ from itertools import zip_longest
 import pdftotext
 from graphviz import Digraph
 
-from . import regexes
+from .regexes import UniversidadeRegexes
+from .universidades import Universidades
+from .exceptions import *
 
 def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
@@ -41,8 +43,14 @@ def do_everything(pdf_file):
 
     try:
         universidade = unidecode.unidecode(first_page[0].strip())
+        if universidade == 'UNIVERSIDADE FEDERAL DE PERNAMBUCO':
+            regexes = UniversidadeRegexes(Universidades.UFPE)
+        elif universidade == 'UNIVERSIDADE FEDERAL RURAL DE PERNAMBUCO':
+            regexes = UniversidadeRegexes(Universidades.UFRPE)
+        else:
+            raise UniversidadeInvalidaError('Universidade do pdf não foi implementada.')
     except:
-        print('Não foi possível extrair o nome da universidade')
+        raise UniversidadeInvalidaError('Não foi possível extrair o nome da universidade')
 
     for page_n in range(len(pdf)):
         page = [ j.strip() for i in pdf[page_n].split('\n') for j in i.split('   ') if j ]
@@ -170,6 +178,10 @@ def do_everything(pdf_file):
                 inside_equiv = False
                 inside_coreq = False
                 inside_prereq = False
+
+            if regexes.observacao_perfil.search(line):
+                # fim do arquivo
+                break
 
 
     if cadeira_construcao != {}:
