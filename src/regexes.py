@@ -1,29 +1,32 @@
 import re
 
-formula_str = '(?:[A-Z]{2}\d{3,}|[A-Z]{4}\d{3,})'
+formula_str = '[A-Z]{2,4}\d{3,}'
 
 formula = re.compile(formula_str)
 
 periodo = re.compile(
-    ('(?:PER.ODO:(\d).|(SEM.?PERIODIZA..O))'))
+    ('(?:PER.ODO: *(\d).|(SEM ?PERIODIZA..O))'))
 
 cadeira = re.compile(
-    ('({}) ?- ?(.+)').format(formula_str))
+    ('({}) *?- *(.+)').format(formula_str))
 
 prereq = re.compile(
     ('PR.-REQUISITO:'))
 
 prereq_None = re.compile(
-    ('N.oh.Pr.-RequisitoparaesseComponenteCurricular.'))
+    ('N.o ?h. ?Pr.-Requisito ?para ?esse ?Componente ?Curricular.'))
 
 coreq = re.compile(
     ('CO-REQUISITO:'))
 
 coreq_None = re.compile(
-    ('N.oh.Co-RequisitoparaesseComponenteCurricular.'))
+    ('N.o ?h. ?Co-Requisito ?para ?esse ?Componente ?Curricular.'))
 
 precoreq_cadeiras = re.compile(
-    ('F.rmula:.*?((?:{}(?:E|OU|e|ou|.*))+)\)?').format(formula_str))
+    ('F.rmula: *?\(?((?:{}(?: ?E ?| ?OU ?| ?e ?| ?ou ?|.*))+)\)?').format(formula_str))
+
+get_cadeiras = re.compile(
+    (' ?(?:e|E|ou|OU)? ?({})').format(formula_str))
 
 equiv = re.compile(
     ('EQUIVAL.NCIA:'))
@@ -35,4 +38,4 @@ carga_horaria = re.compile(
     ('\d{1,}'))
 
 curso = re.compile(
-    ('Curso:(.*)'))
+    ('Curso: *?(.*)'))

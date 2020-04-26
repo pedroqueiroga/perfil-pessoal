@@ -2,7 +2,7 @@
 
 import unidecode
 from itertools import zip_longest
-import PyPDF2
+import pdftotext
 from graphviz import Digraph
 
 from . import regexes
@@ -17,7 +17,7 @@ def do_everything(pdf_file):
     disciplinas_perfil = {}
 
     # pdf_file_obj = open(pdf_file, 'rb')
-    pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+    pdf = pdftotext.PDF(pdf_file)
 
     curso = None
 
@@ -34,14 +34,17 @@ def do_everything(pdf_file):
 
     matches_to_go = 0
 
-    for page_n in range(pdf_reader.numPages):
-        page = pdf_reader.getPage(page_n).extractText().split()
+    # o nome da universidade é a primeira linha
+    first_page = pdf[0].split('\n')
+    universidade = unidecode.unidecode(first_page[0].strip())
+    for page_n in range(len(pdf)):
+        page = [ j.strip() for i in pdf[page_n].split('\n') for j in i.split('   ') if j ]
         i = 0
         while i < len(page):
             line = page[i]
             i += 1
             curso_match = regexes.curso.search(line)
-            if curso_match:
+            if curso_match and not curso:
                 curso = curso_match.group(1)
                 continue
 
@@ -108,7 +111,7 @@ def do_everything(pdf_file):
                 prereq_cadeiras_match = regexes.precoreq_cadeiras.search(line)
                 if prereq_cadeiras_match:
                     cadeiras_group = prereq_cadeiras_match.group(1)
-                    cadeiras = regexes.formula.findall(cadeiras_group)
+                    cadeiras = regexes.get_cadeiras.findall(cadeiras_group)
                     cadeira_construcao['prereq'].extend(cadeiras)
                     matches_to_go = len(cadeiras)
                     continue
@@ -127,7 +130,7 @@ def do_everything(pdf_file):
                 coreq_cadeiras_match = regexes.precoreq_cadeiras.search(line)
                 if coreq_cadeiras_match:
                     cadeiras_group = coreq_cadeiras_match.group(1)
-                    cadeiras = regexes.formula.findall(cadeiras_group)
+                    cadeiras = regexes.get_cadeiras.findall(cadeiras_group)
                     cadeira_construcao['coreq'].extend(cadeiras)
                     matches_to_go = len(cadeiras)
                     continue
@@ -145,7 +148,7 @@ def do_everything(pdf_file):
                 equiv_cadeiras_match = regexes.precoreq_cadeiras.search(line)
                 if equiv_cadeiras_match:
                     cadeiras_group = equiv_cadeiras_match.group(0)
-                    cadeiras = regexes.formula.findall(cadeiras_group)
+                    cadeiras = regexes.get_cadeiras.findall(cadeiras_group)
                     cadeira_construcao['equiv'].extend(cadeiras)
                     matches_to_go = len(cadeiras)
                     continue
@@ -173,8 +176,8 @@ def do_everything(pdf_file):
     max_horizontal = 1;
     last_level = None
     test_switch = True
-    curso = unidecode.unidecode(curso)
     if disciplinas_perfil:
+        curso = unidecode.unidecode(curso)
         g = Digraph(curso, filename='perfil_curricular.gv', engine='dot', format='svg')
 
         for p in disciplinas_perfil:
