@@ -9,7 +9,7 @@ class UniversidadeRegexes():
         if self.universidade == Universidades.UFPE:
             self.formula_str = '[A-Z]{2,4}\d{3,}'
         elif self.universidade == Universidades.UFRPE:
-            self.formula_str = '\d{5}'
+            self.formula_str = '(?:\d{5}|[A-Z]{4}\d{3,})'
 
         self.formula = re.compile(self.formula_str)
         self.periodo = re.compile(
