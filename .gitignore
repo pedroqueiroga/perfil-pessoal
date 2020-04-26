@@ -3,3 +3,4 @@
 pdfs/
 myvenv/
 __pycache__/
+.env

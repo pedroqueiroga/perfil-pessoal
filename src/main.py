@@ -1,6 +1,7 @@
 import os
 from .perfil2 import do_everything
 from . import msgs
+from .settings import settings
 import requests
 import io
 import traceback
@@ -64,5 +65,6 @@ def ajuda():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.getenv("PORT", 5000))
+    debug = bool(os.getenv("DEBUG", False))
+    app.run(host='0.0.0.0', port=port, debug=debug)
