@@ -1,0 +1,15 @@
+#forms form, form input {
+    display: inline;
+}
+
+#forms form {
+    border: solid;
+    border-width: 2px;
+    border-color: purple;
+    padding: 5px;
+}
+
+.divisor {
+    padding-right:100px;
+    padding-left:100px;
+}

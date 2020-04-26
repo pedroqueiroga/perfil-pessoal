@@ -6,12 +6,22 @@
   O botão "Esconder arestas" vai apagar as arestas que não estão realçadas. O botão "Mostrar arestas" vai desenhar as arestas que não estão realçadas. O padrão é o estado de mostrar todas as arestas. É possível ajustar o tamanho do grafo com o controle deslizante.</p>
 <p>Pré-requisitos são arestas entrando: Se a cadeira Benedita possui seta vindo da cadeira Alice, Alice é pré-requisito de Benedita.<br/>
   Co-requisitos são arestas em ambas as direções.</p>
-<form action="upload"
-      method="POST"
-      enctype="multipart/form-data">
-  <input type="file" name="file" />
-  <input type="submit"/>
-</form>
+<div id="forms">
+  <form id="file_form" action="upload"
+        method="POST"
+        enctype="multipart/form-data">
+    <label for="file">Enviar arquivo</label>
+    <input type="file" name="file" />
+    <input type="submit"/>
+  </form>
+  <span class="divisor"></span>
+  <form id="url_form" action="upload"
+        method="POST">
+    <label for="url">Enviar URL</label>
+    <input type="url" name="url" />
+    <input type="submit"/>
+  </form>
+</div>
 
 {% block grafo_content %}
 {% endblock %}
