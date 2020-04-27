@@ -48,15 +48,21 @@ def do_everything(pdf_file):
         elif universidade == 'UNIVERSIDADE FEDERAL RURAL DE PERNAMBUCO':
             regexes = UniversidadeRegexes(Universidades.UFRPE)
         else:
-            raise UniversidadeInvalidaError('Universidade do pdf não foi'
-                                            ' implementada.')
+            raise UniversidadeInvalidaError(
+                'Universidade do pdf não foi implementada.'
+            )
     except Exception:
-        raise UniversidadeInvalidaError('Não foi possível extrair o nome'
-                                        ' da universidade')
+        raise UniversidadeInvalidaError(
+            'Não foi possível extrair o nome da universidade'
+        )
 
     for page_n in range(len(pdf)):
-        page = [j.strip() for i in pdf[page_n].split('\n')
-                for j in i.split('   ') if j]
+        page = [
+            j.strip()
+            for i in pdf[page_n].split('\n')
+            for j in i.split('   ')
+            if j
+        ]
         i = 0
         while i < len(page):
             line = page[i]
@@ -116,7 +122,8 @@ def do_everything(pdf_file):
                 # comeca nova cadeira
                 cadeira_construcao['codigo'] = last_cadeira_match.group(1)
                 cadeira_construcao['nome'] = unidecode.unidecode(
-                    last_cadeira_match.group(2))
+                    last_cadeira_match.group(2)
+                )
                 cadeira_construcao['prereq'] = []
                 cadeira_construcao['coreq'] = []
                 cadeira_construcao['equiv'] = []
@@ -200,11 +207,12 @@ def do_everything(pdf_file):
     max_horizontal = 1
     if disciplinas_perfil:
         curso = unidecode.unidecode(curso)
-        g = Digraph(curso, filename='perfil_curricular.gv', engine='dot',
-                    format='svg')
+        g = Digraph(
+            curso, filename='perfil_curricular.gv', engine='dot', format='svg'
+        )
 
         for p in disciplinas_perfil:
-            with g.subgraph(name='cluster_'+p) as c:
+            with g.subgraph(name='cluster_' + p) as c:
                 c.attr(style='filled')
                 c.attr(color='blue')
                 c.attr(fillcolor='bisque')
@@ -213,8 +221,9 @@ def do_everything(pdf_file):
                 c.attr(shape='box')
                 c.node_attr['style'] = 'filled'
 
-                grouped_disciplinas = grouper(disciplinas_perfil[p],
-                                              max_horizontal)
+                grouped_disciplinas = grouper(
+                    disciplinas_perfil[p], max_horizontal
+                )
                 group_leader = None
                 group_receiver = None
                 for group in grouped_disciplinas:
@@ -224,8 +233,11 @@ def do_everything(pdf_file):
                         for d in group:
                             if not d:
                                 continue
-                            gr.node(d['codigo'], label=d['codigo'],
-                                    tooltip=d['nome'])
+                            gr.node(
+                                d['codigo'],
+                                label=d['codigo'],
+                                tooltip=d['nome'],
+                            )
 
                             for prereq in d['prereq']:
                                 gr.edge(prereq, d['codigo'])

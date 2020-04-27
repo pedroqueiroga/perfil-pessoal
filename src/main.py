@@ -37,15 +37,15 @@ def graph():
             pdf_file = io.BytesIO(res.content)
             res.close()
         else:
-            return render_template('grafo.html',
-                                   error=msgs.ERROR_COULDNT_DOWNLOAD)
+            return render_template(
+                'grafo.html', error=msgs.ERROR_COULDNT_DOWNLOAD
+            )
     elif request.files:
         pdf_file = request.files['file']
         content_type = pdf_file.content_type
     if 'application/pdf' not in content_type:
         request.close()
-        return render_template('grafo.html',
-                               error=msgs.ERROR_NOT_PDF)
+        return render_template('grafo.html', error=msgs.ERROR_NOT_PDF)
     try:
         dot, curso, universidade, perfil = do_everything(pdf_file)
     except Exception as err:
@@ -57,8 +57,13 @@ def graph():
 
     if dot:
         grafo = dot.pipe().decode('utf-8')
-        return render_template('grafo.html', grafo=grafo, curso=curso,
-                               universidade=universidade, perfil=perfil)
+        return render_template(
+            'grafo.html',
+            grafo=grafo,
+            curso=curso,
+            universidade=universidade,
+            perfil=perfil,
+        )
     return render_template('grafo.html', error=msgs.ERROR_COULDNT_EXTRACT)
 
 
@@ -79,8 +84,9 @@ def contato():
     request.close()
 
     if res.status_code == requests.codes['ok']:
-        return render_template('contato.html',
-                               obrigado=msgs.THANKS_FOR_CONTACT)
+        return render_template(
+            'contato.html', obrigado=msgs.THANKS_FOR_CONTACT
+        )
 
     return render_template('contato.html', error=msgs.FAILED_CONTACT)
 
