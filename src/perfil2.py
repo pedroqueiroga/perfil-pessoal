@@ -198,12 +198,6 @@ def do_everything(pdf_file):
         disciplinas_perfil[pp].append(cadeira_construcao)
         cadeira_construcao = {}
 
-    for p in disciplinas_perfil:
-        print(p, ':', sep='')
-        for d in disciplinas_perfil[p]:
-            print('\t', d, sep='')
-        print('\n')
-
     max_horizontal = 1
     if disciplinas_perfil:
         curso = unidecode.unidecode(curso)
