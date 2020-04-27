@@ -5,7 +5,7 @@ from .universidades import Universidades
 class UniversidadeRegexes():
     def __init__(self, universidade):
         self.universidade = universidade
-        
+
         if self.universidade == Universidades.UFPE:
             self.formula_str = '[A-Z]{2,4}\d{3,}'
         elif self.universidade == Universidades.UFRPE:
@@ -25,7 +25,8 @@ class UniversidadeRegexes():
         self.coreq_None = re.compile(
             ('N.o ?h. ?Co-Requisito ?para ?esse ?Componente ?Curricular.'))
         self.precoreq_cadeiras = re.compile(
-            ('F.rmula: *?\(?((?:{}(?: ?E ?| ?OU ?| ?e ?| ?ou ?|.*))+)\)?').format(self.formula_str))
+            ('F.rmula: *?\(?((?:{}(?: ?E ?| ?OU ?| ?e ?| ?ou ?|.*))+)\)?')
+            .format(self.formula_str))
         self.get_cadeiras = re.compile(
             (' ?(?:e|E|ou|OU)? ?({})').format(self.formula_str))
         self.equiv = re.compile(

@@ -1,6 +1,12 @@
+# emacs
 \#*\#
 *~
-pdfs/
-myvenv/
+
+# python
 __pycache__/
+*.pyc
+
+# general
+pdfs/
 .env
+

@@ -1,11 +1,19 @@
-import os
 import requests
+
+from .settings import settings
 
 
 def send_email_to_myself(text):
-    domain = os.getenv('MAILGUN_DOMAIN')
-    api_key = os.getenv('MAILGUN_API_KEY')
-    my_email = os.getenv('MY_EMAIL')
+    """Function to send an e-mail to MY_EMAIL config var
+
+    :param str text: Email content
+    :returns: a response object. 200 ok means email sent successfully.
+    :rtype: requests.response
+
+    """
+    domain = settings.MAILGUN_DOMAIN
+    api_key = settings.API_KEY
+    my_email = settings.MY_EMAIL
 
     return requests.post(
         f'https://api.mailgun.net/v3/{domain}/messages',
